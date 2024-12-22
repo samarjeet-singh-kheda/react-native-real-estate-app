@@ -54,7 +54,7 @@ export default function SignIn() {
 
           <TouchableOpacity
             onPress={handleLogin}
-            className="bg-white shadow-md shadow-zinc-300 rounded-full w-full py-4 mt-5"
+            className="bg-black-300 shadow-md shadow-zinc-300 rounded-full border w-full py-4 mt-5"
           >
             <View className="flex flex-row items-center justify-center ">
               <Image
@@ -63,7 +63,7 @@ export default function SignIn() {
                 resizeMode="contain"
               />
 
-              <Text className="text-lg font-rubik-medium text-black-100 ml-2">
+              <Text className="text-lg font-rubik-medium text-white ml-2">
                 Continue with Google
               </Text>
             </View>
