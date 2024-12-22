@@ -27,14 +27,16 @@ export async function login() {
       redirectUri
     );
 
-    if (!response) throw new Error("Failed to login");
+    if (!response) throw new Error("OAuth token creation failed");
 
     const browserResult = await openAuthSessionAsync(
+      // to create a mobile browser window
       response.toString(),
       redirectUri
     );
 
-    if (browserResult.type !== "success") throw new Error("Failed to login");
+    if (browserResult.type !== "success")
+      throw new Error("OAuth token creation failed");
 
     const url = new URL(browserResult.url);
 
@@ -49,7 +51,7 @@ export async function login() {
 
     return true;
   } catch (err) {
-    console.error(err);
+    console.error("Login failed:", err);
 
     return false;
   }
@@ -57,17 +59,17 @@ export async function login() {
 
 export async function logout() {
   try {
-    await account.deleteSession("current");
+    const result = await account.deleteSession("current");
 
-    return true;
+    return result;
   } catch (err) {
-    console.error(err);
+    console.error("Logout failed:", err);
 
     return false;
   }
 }
 
-export async function getUser() {
+export async function getCurrentUser() {
   try {
     const response = await account.get();
 
@@ -76,11 +78,11 @@ export async function getUser() {
 
       return {
         ...response,
-        avatar: userAvatar.toString(),
+        avatar: userAvatar?.toString(),
       };
     }
   } catch (err) {
-    console.error(err);
+    console.error("Failed to fetch user:", err);
 
     return null;
   }
