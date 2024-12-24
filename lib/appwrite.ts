@@ -4,6 +4,7 @@ import {
   Avatars,
   OAuthProvider,
   Databases,
+  Query,
 } from "react-native-appwrite";
 import * as Linking from "expo-linking";
 import { openAuthSessionAsync } from "expo-web-browser";
@@ -99,5 +100,62 @@ export async function getCurrentUser() {
     console.error("Failed to fetch user:", err);
 
     return null;
+  }
+}
+
+export async function getLatestProperties() {
+  try {
+    const result = await databases.listDocuments(
+      config.databaseId!,
+      config.propertiesCollectionId!,
+      [Query.orderAsc("$createdAt"), Query.limit(5)]
+    );
+
+    return result.documents;
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
+
+export async function getProperties({
+  filter,
+  query,
+  limit,
+}: {
+  filter: string;
+  query: string;
+  limit?: number;
+}) {
+  try {
+    const buildQuery = [Query.orderDesc("$createdAt")];
+
+    if (filter && filter !== "All") {
+      buildQuery.push(Query.equal("type", filter));
+    }
+
+    if (query) {
+      buildQuery.push(
+        Query.or([
+          Query.search("name", query),
+          Query.search("address", query),
+          Query.search("type", query),
+        ])
+      );
+    }
+
+    if (limit) buildQuery.push(Query.limit(limit));
+
+    const result = await databases.listDocuments(
+      config.databaseId!,
+      config.propertiesCollectionId!,
+      buildQuery
+    );
+
+    return result.documents;
+  } catch (err) {
+    console.error(err);
+
+    return [];
   }
 }
