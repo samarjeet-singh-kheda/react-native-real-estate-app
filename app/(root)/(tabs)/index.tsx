@@ -1,5 +1,6 @@
 import { Card, FeaturedCard } from "@/components/Cards";
 import Filters from "@/components/Filters";
+import NoResults from "@/components/NoResults";
 import Search from "@/components/Search";
 import icons from "@/constants/icons";
 import { getLatestProperties, getProperties } from "@/lib/appwrite";
@@ -8,6 +9,7 @@ import { useAppwrite } from "@/lib/useAppwrite";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   ScrollView,
@@ -63,6 +65,13 @@ export default function Index() {
         contentContainerClassName="pb-32" // TODO: might change later
         columnWrapperClassName="flex gap-5 px-2"
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          loading ? (
+            <ActivityIndicator size="large" className="text-primary-300 mt-5" />
+          ) : (
+            <NoResults />
+          )
+        }
         ListHeaderComponent={
           <ScrollView>
             <View className="px-5">
@@ -100,20 +109,29 @@ export default function Index() {
                   </TouchableOpacity>
                 </View>
 
-                <FlatList
-                  data={latestProperties || []}
-                  renderItem={({ item }) => (
-                    <FeaturedCard
-                      item={item}
-                      onPress={() => handleCardPress(item.$id)}
-                    />
-                  )}
-                  keyExtractor={(item) => item.$id}
-                  horizontal
-                  bounces={false}
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerClassName="flex gap-5 mt-5"
-                />
+                {latestPropertiesLoading ? (
+                  <ActivityIndicator
+                    size="large"
+                    className="text-primary-300"
+                  />
+                ) : !latestProperties || latestProperties.length === 0 ? (
+                  <NoResults />
+                ) : (
+                  <FlatList
+                    data={latestProperties || []}
+                    renderItem={({ item }) => (
+                      <FeaturedCard
+                        item={item}
+                        onPress={() => handleCardPress(item.$id)}
+                      />
+                    )}
+                    keyExtractor={(item) => item.$id}
+                    horizontal
+                    bounces={false}
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerClassName="flex gap-5 mt-5"
+                  />
+                )}
               </View>
               <View className="flex flex-row items-center justify-between">
                 <Text className="text-xl font-rubik-bold text-black-300">
